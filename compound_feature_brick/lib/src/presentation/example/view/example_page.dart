@@ -1,8 +1,19 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
 import 'package:compound_feature_brick/src/presentation/example/bloc/bloc.dart';
-import 'package:compound_feature_brick/src/presentation/example/widgets/parts.dart';
+part 'package:compound_feature_brick/src/presentation/example/widgets/example_body.dart';
+part 'package:compound_feature_brick/src/presentation/example/pages/tab_one/bloc/tab_one_bloc.dart';
+part 'package:compound_feature_brick/src/presentation/example/pages/tab_one/bloc/tab_one_event.dart';
+part 'package:compound_feature_brick/src/presentation/example/pages/tab_one/bloc/tab_one_state.dart';
+part 'package:compound_feature_brick/src/presentation/example/pages/tab_one/view/tab_one_page.dart';
+part 'package:compound_feature_brick/src/presentation/example/pages/tab_one/widgets/tab_one_body.dart';
+part 'package:compound_feature_brick/src/presentation/example/pages/tab_two/bloc/tab_two_bloc.dart';
+part 'package:compound_feature_brick/src/presentation/example/pages/tab_two/bloc/tab_two_event.dart';
+part 'package:compound_feature_brick/src/presentation/example/pages/tab_two/bloc/tab_two_state.dart';
+part 'package:compound_feature_brick/src/presentation/example/pages/tab_two/view/tab_two_page.dart';
+part 'package:compound_feature_brick/src/presentation/example/pages/tab_two/widgets/tab_two_body.dart';
 
 /// {@template example_page}
 /// A description for ExamplePage
@@ -24,6 +35,7 @@ class ExamplePage extends StatefulWidget {
 
 class _ExamplePageState extends State<ExamplePage>
     with SingleTickerProviderStateMixin {
+      //TODO: 
   static const List<Tab> myTabs = <Tab>[
     Tab(text: 'Tab 1'),
     Tab(text: 'Tab 2'),
@@ -55,7 +67,7 @@ class _ExamplePageState extends State<ExamplePage>
             controller: _tabController,
           ),
         ),
-        body: ExampleView(
+        body: _ExampleView(
           tabController: _tabController,
         ),
       ),
@@ -69,9 +81,9 @@ class _ExamplePageState extends State<ExamplePage>
 /// Displays the Body of ExampleView
 /// {@endtemplate}
 ///
-class ExampleView extends StatelessWidget {
+class _ExampleView extends StatelessWidget {
   /// {@macro example_view}
-  const ExampleView({
+  const _ExampleView({
     required TabController tabController,
     super.key,
   }) : _tabController = tabController;
@@ -80,7 +92,7 @@ class ExampleView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ExampleBody(
+    return _ExampleBody(
       tabController: _tabController,
     );
   }

@@ -1,15 +1,15 @@
-part of 'package:compound_feature_brick/src/presentation/example/widgets/parts.dart';
+part of 'package:compound_feature_brick/src/presentation/example/view/example_page.dart';
 
-enum TabOneStatus {
+enum _TabOneStatus {
   initial,
   loading,
   success,
   failure;
 
-  bool get isInitial => this == TabOneStatus.initial;
-  bool get isLoading => this == TabOneStatus.loading;
-  bool get isSuccess => this == TabOneStatus.success;
-  bool get isFailure => this == TabOneStatus.failure;
+  bool get isInitial => this == _TabOneStatus.initial;
+  bool get isLoading => this == _TabOneStatus.loading;
+  bool get isSuccess => this == _TabOneStatus.success;
+  bool get isFailure => this == _TabOneStatus.failure;
 }
 
 /// {@template step_one_state}
@@ -18,18 +18,18 @@ enum TabOneStatus {
 class _TabOneState extends Equatable {
   /// {@macro step_one_state}
   const _TabOneState({
-    this.status = TabOneStatus.initial,
+    this.status = _TabOneStatus.initial,
   });
 
   /// Status of the state
-  final TabOneStatus status;
+  final _TabOneStatus status;
 
   @override
   List<Object> get props => [status];
 
   /// Creates a copy of the current TabOneState with property changes
   _TabOneState copyWith({
-    TabOneStatus? status,
+    _TabOneStatus? status,
   }) {
     return _TabOneState(
       status: status ?? this.status,

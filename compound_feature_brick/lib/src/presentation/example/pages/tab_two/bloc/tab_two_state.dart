@@ -1,4 +1,4 @@
-part of 'package:compound_feature_brick/src/presentation/example/widgets/parts.dart';
+part of 'package:compound_feature_brick/src/presentation/example/view/example_page.dart';
 
 enum TabTwoStatus {
   initial,
