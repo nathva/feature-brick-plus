@@ -1,4 +1,3 @@
-import 'package:compound_feature_brick/counter/counter.dart';
 import 'package:compound_feature_brick/l10n/l10n.dart';
 import 'package:compound_feature_brick/src/presentation/example/view/example_page.dart';
 import 'package:flutter/material.dart';
