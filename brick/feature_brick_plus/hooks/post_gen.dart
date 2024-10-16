@@ -3,6 +3,16 @@ import 'dart:io';
 import 'package:mason/mason.dart';
 
 Future<void> run(HookContext context) async {
+  final isTabbed = context.vars['isTabbed'] as bool;
+  // final isStepper = context.vars['is_stepper'] as bool;
+
+  if (isTabbed) {
+    createTabs(context);
+  }
+  // if (isStepper) {
+  //   createSteps(context);
+  // }
+
   final includeTests = context.vars['include_tests'] as bool;
   if (!includeTests) {
     return;
@@ -31,6 +41,46 @@ Future<void> run(HookContext context) async {
   );
 
   progress.complete(green.wrap('Tests created!') as String);
+}
+
+// Future<void> createSteps(HookContext context) {
+//   final fullPath = context.vars['fullPath'];
+// }
+
+Future<void> createTabs(HookContext context) async {
+  // final fullPath = context.vars['fullPath'];
+  final featureName = (context.vars['feature_name'] as String).snakeCase;
+  final directory = Directory.current.path;
+
+  String pathName;
+
+  if (Platform.isWindows) {
+    pathName = directory + r'\' + featureName;
+  } else {
+    pathName = directory + '/' + featureName;
+  }
+
+  final amountOfTabs = context.vars['childrenAmount'] as int? ?? 0;
+  int index = 0;
+  final namesList = context.vars['childrenNames'];
+
+  while (index <= (amountOfTabs - 1)) {
+    final name = namesList[index];
+    final featureTabGen =
+        await MasonGenerator.fromBundle(tabbedFeatureBundle(tabName: name));
+    context.vars = {
+      ...context.vars,
+      'tab_name': name,
+    };
+    await featureTabGen.generate(
+      DirectoryGeneratorTarget(
+        Directory(pathName),
+      ),
+      logger: context.logger,
+      vars: context.vars,
+    );
+    index++;
+  }
 }
 
 final featureBrickTestsBundle = MasonBundle.fromJson(<String, dynamic>{
@@ -126,3 +176,78 @@ final featureBrickTestsBundle = MasonBundle.fromJson(<String, dynamic>{
   },
   "vars": {}
 });
+
+MasonBundle tabbedFeatureBundle({required String tabName}) {
+  final snakeCaseName = toSnakeCase(tabName);
+  return MasonBundle.fromJson(<String, dynamic>{
+    "files": [
+      {
+        "path": "tabs/${snakeCaseName}/bloc/${snakeCaseName}_bloc.dart",
+        "data":
+            "cGFydCBvZiAncGFja2FnZTp7e3tmdWxsUGF0aH19fS9iYXNlL3t7ZmVhdHVyZV9uYW1lLnNuYWtlQ2FzZSgpfX1fcGFnZS5kYXJ0JzsKCmNsYXNzIF97e3RhYl9uYW1lLnBhc2NhbENhc2UoKX19QmxvYyBleHRlbmRzIEJsb2M8X3t7dGFiX25hbWUucGFzY2FsQ2FzZSgpfX1FdmVudCwgX3t7dGFiX25hbWUucGFzY2FsQ2FzZSgpfX1TdGF0ZT4gewogIF97e3RhYl9uYW1lLnBhc2NhbENhc2UoKX19QmxvYygpIDogc3VwZXIoY29uc3QgX3t7dGFiX25hbWUucGFzY2FsQ2FzZSgpfX1TdGF0ZSgpKTsKfQo=",
+        "type": "text"
+      },
+      {
+        "path": "tabs/${snakeCaseName}/bloc/${snakeCaseName}_event.dart",
+        "data":
+            "cGFydCBvZiAncGFja2FnZTp7e3tmdWxsUGF0aH19fS9iYXNlL3t7ZmVhdHVyZV9uYW1lLnNuYWtlQ2FzZSgpfX1fcGFnZS5kYXJ0JzsKCmFic3RyYWN0IGNsYXNzIF97e3RhYl9uYW1lLnBhc2NhbENhc2UoKX19RXZlbnQgZXh0ZW5kcyBFcXVhdGFibGUgewogIGNvbnN0IF97e3RhYl9uYW1lLnBhc2NhbENhc2UoKX19RXZlbnQoKTsKCiAgQG92ZXJyaWRlCiAgTGlzdDxPYmplY3Q+IGdldCBwcm9wcyA9PiBbXTsKfQo=",
+        "type": "text"
+      },
+      {
+        "path": "tabs/${snakeCaseName}/bloc/${snakeCaseName}_state.dart",
+        "data":
+            "cGFydCBvZiAncGFja2FnZTp7e3tmdWxsUGF0aH19fS9iYXNlL3t7ZmVhdHVyZV9uYW1lLnNuYWtlQ2FzZSgpfX1fcGFnZS5kYXJ0JzsKCmVudW0gX3t7dGFiX25hbWUucGFzY2FsQ2FzZSgpfX1TdGF0dXMgewogIGluaXRpYWwsCiAgbG9hZGluZywKICBzdWNjZXNzLAogIGZhaWx1cmU7CgogIGJvb2wgZ2V0IGlzSW5pdGlhbCA9PiB0aGlzID09IF97e3RhYl9uYW1lLnBhc2NhbENhc2UoKX19U3RhdHVzLmluaXRpYWw7CiAgYm9vbCBnZXQgaXNMb2FkaW5nID0+IHRoaXMgPT0gX3t7dGFiX25hbWUucGFzY2FsQ2FzZSgpfX1TdGF0dXMubG9hZGluZzsKICBib29sIGdldCBpc1N1Y2Nlc3MgPT4gdGhpcyA9PSBfe3t0YWJfbmFtZS5wYXNjYWxDYXNlKCl9fVN0YXR1cy5zdWNjZXNzOwogIGJvb2wgZ2V0IGlzRmFpbHVyZSA9PiB0aGlzID09IF97e3RhYl9uYW1lLnBhc2NhbENhc2UoKX19U3RhdHVzLmZhaWx1cmU7Cn0KCi8vLyB7QHRlbXBsYXRlIHN0ZXBfb25lX3N0YXRlfQovLy8ge3t0YWJfbmFtZS5wYXNjYWxDYXNlKCl9fVN0YXRlIGRlc2NyaXB0aW9uCi8vLyB7QGVuZHRlbXBsYXRlfQpjbGFzcyBfe3t0YWJfbmFtZS5wYXNjYWxDYXNlKCl9fVN0YXRlIGV4dGVuZHMgRXF1YXRhYmxlIHsKICAvLy8ge0BtYWNybyBzdGVwX29uZV9zdGF0ZX0KICBjb25zdCBfe3t0YWJfbmFtZS5wYXNjYWxDYXNlKCl9fVN0YXRlKHsKICAgIHRoaXMuc3RhdHVzID0gX3t7dGFiX25hbWUucGFzY2FsQ2FzZSgpfX1TdGF0dXMuaW5pdGlhbCwKICB9KTsKCiAgLy8vIFN0YXR1cyBvZiB0aGUgc3RhdGUKICBmaW5hbCBfe3t0YWJfbmFtZS5wYXNjYWxDYXNlKCl9fVN0YXR1cyBzdGF0dXM7CgogIEBvdmVycmlkZQogIExpc3Q8T2JqZWN0PiBnZXQgcHJvcHMgPT4gW3N0YXR1c107CgogIC8vLyBDcmVhdGVzIGEgY29weSBvZiB0aGUgY3VycmVudCB7e3RhYl9uYW1lLnBhc2NhbENhc2UoKX19U3RhdGUgd2l0aCBwcm9wZXJ0eSBjaGFuZ2VzCiAgX3t7dGFiX25hbWUucGFzY2FsQ2FzZSgpfX1TdGF0ZSBjb3B5V2l0aCh7CiAgICBfe3t0YWJfbmFtZS5wYXNjYWxDYXNlKCl9fVN0YXR1cz8gc3RhdHVzLAogIH0pIHsKICAgIHJldHVybiBfe3t0YWJfbmFtZS5wYXNjYWxDYXNlKCl9fVN0YXRlKAogICAgICBzdGF0dXM6IHN0YXR1cyA/PyB0aGlzLnN0YXR1cywKICAgICk7CiAgfQp9Cg==",
+        "type": "text"
+      },
+      {
+        "path": "tabs/${snakeCaseName}/base/${snakeCaseName}_page.dart",
+        "data":
+            "cGFydCBvZiAncGFja2FnZTp7e3tmdWxsUGF0aH19fS9iYXNlL3t7ZmVhdHVyZV9uYW1lLnNuYWtlQ2FzZSgpfX1fcGFnZS5kYXJ0JzsKCmNsYXNzIF97e3RhYl9uYW1lLnBhc2NhbENhc2UoKX19UGFnZSBleHRlbmRzIFN0YXRlbGVzc1dpZGdldCB7CiAgLy8vIHtAbWFjcm8gc3RlcF9vbmVfcGFnZX0KICBjb25zdCBfe3t0YWJfbmFtZS5wYXNjYWxDYXNlKCl9fVBhZ2UoKTsKCiAgQG92ZXJyaWRlCiAgV2lkZ2V0IGJ1aWxkKEJ1aWxkQ29udGV4dCBjb250ZXh0KSB7CiAgICByZXR1cm4gQmxvY1Byb3ZpZGVyKAogICAgICBjcmVhdGU6IChjb250ZXh0KSA9PiBfe3t0YWJfbmFtZS5wYXNjYWxDYXNlKCl9fUJsb2MoKSwKICAgICAgY2hpbGQ6IGNvbnN0IFNjYWZmb2xkKAogICAgICAgIC8vIGFwcEJhcjogQXBwQmFyKAogICAgICAgIC8vICAgdGl0bGU6IGNvbnN0IFRleHQoJ3t7dGFiX25hbWUucGFzY2FsQ2FzZSgpfX0nKSwKICAgICAgICAvLyApLAogICAgICAgIGJvZHk6IF97e3RhYl9uYW1lLnBhc2NhbENhc2UoKX19VmlldygpLAogICAgICApLAogICAgKTsKICB9Cn0KCi8vIE5PVEU6IERlY2xhcmUgYWxsIEJsb2NMaXN0ZW5lcnMgb2Yge3t0YWJfbmFtZS5wYXNjYWxDYXNlKCl9fSBoZXJlIHRvIGhhbmRsZSBuYXZpZ2F0aW9uLAovLyBzaG93aW5nIGRpYWxvZ3MsIGV0Yy4KLy8vIHtAdGVtcGxhdGUgc3RlcF9vbmVfdmlld30KLy8vIERpc3BsYXlzIHRoZSBCb2R5IG9mIF97e3RhYl9uYW1lLnBhc2NhbENhc2UoKX19VmlldwovLy8ge0BlbmR0ZW1wbGF0ZX0KLy8vCmNsYXNzIF97e3RhYl9uYW1lLnBhc2NhbENhc2UoKX19VmlldyBleHRlbmRzIFN0YXRlbGVzc1dpZGdldCB7CiAgLy8vIHtAbWFjcm8gc3RlcF9vbmVfdmlld30KICBjb25zdCBfe3t0YWJfbmFtZS5wYXNjYWxDYXNlKCl9fVZpZXcoKTsKCiAgQG92ZXJyaWRlCiAgV2lkZ2V0IGJ1aWxkKEJ1aWxkQ29udGV4dCBjb250ZXh0KSB7CiAgICByZXR1cm4gY29uc3QgX3t7dGFiX25hbWUucGFzY2FsQ2FzZSgpfX1Cb2R5KCk7CiAgfQp9Cg==",
+        "type": "text"
+      },
+      {
+        "path": "tabs/${snakeCaseName}/base/${snakeCaseName}_body.dart",
+        "data":
+            "Ly8gaWdub3JlX2Zvcl9maWxlOiBwcmVmZXJfY29uc3RfY29uc3RydWN0b3JzCnBhcnQgb2YgJ3BhY2thZ2U6e3t7ZnVsbFBhdGh9fX0vYmFzZS97e2ZlYXR1cmVfbmFtZS5zbmFrZUNhc2UoKX19X3BhZ2UuZGFydCc7CgovLyBOT1RFOiBEZWNsYXJlIGFsbCB0aGUgVUkgd2lkZ2V0cyBoZXJlLCBpbmNsdWRpbmcgQmxvY0J1aWxkZXJzLgovLy8ge0B0ZW1wbGF0ZSBzdGVwX29uZV9ib2R5fQovLy8gQm9keSBvZiB0aGUge3t0YWJfbmFtZS5wYXNjYWxDYXNlKCl9fVBhZ2UuCi8vLyB7QGVuZHRlbXBsYXRlfQpjbGFzcyBfe3t0YWJfbmFtZS5wYXNjYWxDYXNlKCl9fUJvZHkgZXh0ZW5kcyBTdGF0ZWxlc3NXaWRnZXQgewogIC8vLyB7QG1hY3JvIHN0ZXBfb25lX2JvZHl9CiAgY29uc3QgX3t7dGFiX25hbWUucGFzY2FsQ2FzZSgpfX1Cb2R5KCk7CgogIEBvdmVycmlkZQogIFdpZGdldCBidWlsZChCdWlsZENvbnRleHQgY29udGV4dCkgewogICAgcmV0dXJuIEJsb2NCdWlsZGVyPF97e3RhYl9uYW1lLnBhc2NhbENhc2UoKX19QmxvYywgX3t7dGFiX25hbWUucGFzY2FsQ2FzZSgpfX1TdGF0ZT4oCiAgICAgIGJ1aWxkZXI6IChjb250ZXh0LCBzdGF0ZSkgewogICAgICAgIHJldHVybiBjb25zdCBDZW50ZXIoY2hpbGQ6IFRleHQoJ3t7dGFiX25hbWUucGFzY2FsQ2FzZSgpfX1QYWdlJykpOwogICAgICB9LAogICAgKTsKICB9Cn0K",
+        "type": "text"
+      },
+      {
+        "path": "tabs/${snakeCaseName}/widgets/widgets.dart",
+        "data":
+            "Ly8gVE9ETzogYWRkIGFueSB3aWRnZXRzIGNyZWF0ZWQgZm9yIHRoaXMgdGFiLiBJbiBjYXNlIHRoZXJlIGFyZW4ndCBhbnksIGRlbGV0ZSB0aGlzIGZvbGRlci4=",
+        "type": "text"
+      },
+    ],
+    "name": "tabbed_feature_brick",
+    "description":
+        "A supporting brick for feature_brick that creates a tabbed feature",
+    "version": "0.0.1",
+    "readme": {
+      "path": "README.md",
+      "data":
+          "IyBGZWF0dXJlIEJyaWNrIFRlc3RzDQoNCkEgc3VwcG9ydGluZyBicmljayB0byBjcmVhdGUgeW91ciBmZWF0dXJlcyB0ZXN0cyB3aXRoIDEwMCUgY292ZXJhZ2UgdXNpbmcgYmVzdCBwcmFjdGljZXMgYW5kIHlvdXIgc3RhdGUgbWFuYWdlbWVudCBvZiBjaG9pY2UhIFN1cHBvcnRzIEJsb2MsIEN1Yml0LCBOb25lLg0KDQojIyBIb3cgdG8gdXNlIPCfmoANCg0KYGBgDQptYXNvbiBtYWtlIGZlYXR1cmVfYnJpY2sgLS1mZWF0dXJlX25hbWUgbG9naW4gLS1zdGF0ZV9tYW5hZ2VtZW50IGJsb2MNCmBgYA0KDQojIyBWYXJpYWJsZXMg4pyoDQoNCk4vQSBhcyB0aGlzIGlzIGEgc3VwcG9ydGluZyBicmljayBmb3IgZmVhdHVyZV9icmljaw0KDQojIyBPdXRwdXRzIPCfk6YNCg0KYGBgDQotLWZlYXR1cmVfbmFtZSBsb2dpbiAtLXN0YXRlX21hbmFnZW1lbnQgYmxvYw0K4pSc4pSA4pSAIGxvZ2luDQrilIIgICDilJzilIDilIAgYmxvYw0K4pSCICAg4pSCICAg4pSc4pSA4pSAIGxvZ2luX2Jsb2NfdGVzdC5kYXJ0DQrilIIgICDilIIgICDilJzilIDilIAgbG9naW5fZXZlbnRfdGVzdC5kYXJ0DQrilIIgICDilIIgICDilJTilIDilIAgbG9naW5fc3RhdGVfdGVzdC5kYXJ0DQrilIIgICDilJzilIDilIAgdmlldw0K4pSCICAg4pSCICAg4pSc4pSA4pSAIGxvZ2luX3BhZ2VfdGVzdC5kYXJ0DQrilIIgICDilIIgICDilJTilIDilIB3aWRnZXRzDQrilIIgICDilIIgICAgICAg4pSU4pSA4pSAIGxvZ2luX2JvZHlfdGVzdC5kYXJ0DQrilJTilIDilIAgLi4uDQpgYGANCg0KYGBgDQotLWZlYXR1cmVfbmFtZSBsb2dpbiAtLXN0YXRlX21hbmFnZW1lbnQgY3ViaXQNCuKUnOKUgOKUgCBsb2dpbg0K4pSCICAg4pSc4pSA4pSAIGN1Yml0DQrilIIgICDilIIgICDilJzilIDilIAgbG9naW5fY3ViaXRfdGVzdC5kYXJ0DQrilIIgICDilIIgICDilJTilIDilIAgbG9naW5fc3RhdGVfdGVzdC5kYXJ0DQrilIIgICDilJzilIDilIAgdmlldw0K4pSCICAg4pSCICAg4pSc4pSA4pSAIGxvZ2luX3BhZ2VfdGVzdC5kYXJ0DQrilIIgICDilIIgICDilJTilIDilIB3aWRnZXRzDQrilIIgICDilIIgICAgICAg4pSU4pSA4pSAIGxvZ2luX2JvZHlfdGVzdC5kYXJ0DQrilJTilIDilIAgLi4uDQpgYGANCg==",
+      "type": "text"
+    },
+    "changelog": {
+      "path": "CHANGELOG.md",
+      "data":
+          "IyAwLjAuMQ0KDQotIENyZWF0ZSBpbml0aWFsIEZlYXR1cmUgQnJpY2sgVGVzdHMgd2hpY2ggc3VwcG9ydHMgYmxvYywgY3ViaXQsIGFuZCBub25lDQo=",
+      "type": "text"
+    },
+    "license": {
+      "path": "LICENSE",
+      "data":
+          "TUlUIExpY2Vuc2UNCg0KQ29weXJpZ2h0IChjKSAyMDIyIEx1a2UgTW9vZHkNCg0KUGVybWlzc2lvbiBpcyBoZXJlYnkgZ3JhbnRlZCwgZnJlZSBvZiBjaGFyZ2UsIHRvIGFueSBwZXJzb24gb2J0YWluaW5nIGEgY29weQ0Kb2YgdGhpcyBzb2Z0d2FyZSBhbmQgYXNzb2NpYXRlZCBkb2N1bWVudGF0aW9uIGZpbGVzICh0aGUgIlNvZnR3YXJlIiksIHRvIGRlYWwNCmluIHRoZSBTb2Z0d2FyZSB3aXRob3V0IHJlc3RyaWN0aW9uLCBpbmNsdWRpbmcgd2l0aG91dCBsaW1pdGF0aW9uIHRoZSByaWdodHMNCnRvIHVzZSwgY29weSwgbW9kaWZ5LCBtZXJnZSwgcHVibGlzaCwgZGlzdHJpYnV0ZSwgc3VibGljZW5zZSwgYW5kL29yIHNlbGwNCmNvcGllcyBvZiB0aGUgU29mdHdhcmUsIGFuZCB0byBwZXJtaXQgcGVyc29ucyB0byB3aG9tIHRoZSBTb2Z0d2FyZSBpcw0KZnVybmlzaGVkIHRvIGRvIHNvLCBzdWJqZWN0IHRvIHRoZSBmb2xsb3dpbmcgY29uZGl0aW9uczoNCg0KVGhlIGFib3ZlIGNvcHlyaWdodCBub3RpY2UgYW5kIHRoaXMgcGVybWlzc2lvbiBub3RpY2Ugc2hhbGwgYmUgaW5jbHVkZWQgaW4gYWxsDQpjb3BpZXMgb3Igc3Vic3RhbnRpYWwgcG9ydGlvbnMgb2YgdGhlIFNvZnR3YXJlLg0KDQpUSEUgU09GVFdBUkUgSVMgUFJPVklERUQgIkFTIElTIiwgV0lUSE9VVCBXQVJSQU5UWSBPRiBBTlkgS0lORCwgRVhQUkVTUyBPUg0KSU1QTElFRCwgSU5DTFVESU5HIEJVVCBOT1QgTElNSVRFRCBUTyBUSEUgV0FSUkFOVElFUyBPRiBNRVJDSEFOVEFCSUxJVFksDQpGSVRORVNTIEZPUiBBIFBBUlRJQ1VMQVIgUFVSUE9TRSBBTkQgTk9OSU5GUklOR0VNRU5ULiBJTiBOTyBFVkVOVCBTSEFMTCBUSEUNCkFVVEhPUlMgT1IgQ09QWVJJR0hUIEhPTERFUlMgQkUgTElBQkxFIEZPUiBBTlkgQ0xBSU0sIERBTUFHRVMgT1IgT1RIRVINCkxJQUJJTElUWSwgV0hFVEhFUiBJTiBBTiBBQ1RJT04gT0YgQ09OVFJBQ1QsIFRPUlQgT1IgT1RIRVJXSVNFLCBBUklTSU5HIEZST00sDQpPVVQgT0YgT1IgSU4gQ09OTkVDVElPTiBXSVRIIFRIRSBTT0ZUV0FSRSBPUiBUSEUgVVNFIE9SIE9USEVSIERFQUxJTkdTIElOIFRIRQ0KU09GVFdBUkUuDQo=",
+      "type": "text"
+    },
+    "vars": {}
+  });
+}
+
+String toSnakeCase(String input) {
+  return input
+      .replaceAllMapped(RegExp(r'([a-z])([A-Z])'),
+          (match) => '${match.group(1)}_${match.group(2)}')
+      .replaceAll(RegExp(r'\s+'), '_')
+      .toLowerCase();
+}

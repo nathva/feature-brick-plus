@@ -1,1 +1,1 @@
-export '{{feature_name.snakeCase()}}_body.dart';
+// TODO: add any widgets created for this feature. In case there aren't any, delete this folder.
