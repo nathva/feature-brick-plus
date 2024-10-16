@@ -57,22 +57,6 @@ Future run(HookContext context) async {
     defaultValue: false,
   );
 
-  // final stateManagement =
-  //     context.vars['state_management'].toString().toLowerCase();
-  // final isBloc = stateManagement == 'bloc';
-  // final isCubit = stateManagement == 'cubit';
-  // final isProvider = stateManagement == 'provider';
-  // final isRiverpod = stateManagement == 'riverpod';
-  // final isNone = !isBloc && !isCubit && !isProvider && !isRiverpod;
-
-  // bool useEquatable = false;
-  // if (isBloc || isCubit) {
-  //   useEquatable = context.logger.confirm(
-  //     '? Do you want to use equatable with your $stateManagement? (Y/n)',
-  //     defaultValue: true,
-  //   );
-  // }
-
   final directory = Directory.current.path;
   List<String> folders;
   try {

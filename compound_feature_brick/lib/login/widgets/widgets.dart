@@ -1,1 +1,0 @@
-// TODO: add any widgets created for this feature. In case there isn't any, delete this folder.
