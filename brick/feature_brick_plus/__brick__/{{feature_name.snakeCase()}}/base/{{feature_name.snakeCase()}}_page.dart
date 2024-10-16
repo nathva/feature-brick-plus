@@ -19,11 +19,11 @@ part 'package:{{{fullPath}}}/tabs/{{#snakeCase}}{{.}}{{/snakeCase}}/bloc/{{#snak
   const {{feature_name.pascalCase()}}Page({super.key});
 
   /// The path name of {{feature_name.pascalCase()}}Page. Use for navigation.
-  const path = '/$routeName';
+  static const path = '/$routeName';
   
   /// The route name of {{feature_name.pascalCase()}}Page. Use to navigate
   /// with named routes.
-  const routeName = '{{feature_name.paramCase()}}';
+  static const routeName = '{{feature_name.paramCase()}}';
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +33,7 @@ part 'package:{{{fullPath}}}/tabs/{{#snakeCase}}{{.}}{{/snakeCase}}/bloc/{{#snak
         appBar: AppBar(
           title: const Text('{{feature_name.pascalCase()}}'),
         ),
-        body: const {{feature_name.pascalCase()}}View(),
+        body: const _{{feature_name.pascalCase()}}View(),
       ),
     );
   }
@@ -44,13 +44,13 @@ part 'package:{{{fullPath}}}/tabs/{{#snakeCase}}{{.}}{{/snakeCase}}/bloc/{{#snak
 /// Displays the Body of {{feature_name.pascalCase()}}View
 /// {@endtemplate}
 /// 
-class {{feature_name.pascalCase()}}View extends StatelessWidget {
+class _{{feature_name.pascalCase()}}View extends StatelessWidget {
   /// {@macro {{feature_name.snakeCase()}}_view}
-  const {{feature_name.pascalCase()}}View({super.key});
+  const _{{feature_name.pascalCase()}}View({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const {{feature_name.pascalCase()}}Body();
+    return const _{{feature_name.pascalCase()}}Body();
   }
 }{{/isConventional}}{{#isTabbed}}
 class {{feature_name.pascalCase()}}Page extends StatefulWidget {
