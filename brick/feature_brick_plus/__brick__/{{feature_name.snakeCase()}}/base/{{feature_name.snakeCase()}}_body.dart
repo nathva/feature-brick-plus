@@ -41,4 +41,39 @@ class _{{feature_name.pascalCase()}}Body extends StatelessWidget {
       },
     );
   }
-}{{/isTabbed}}
+}{{/isTabbed}}{{#isStepper}}
+class _{{feature_name.pascalCase()}}Body extends StatelessWidget {
+  /// {@macro {{feature_name.snakeCase()}}_body}
+  _{{feature_name.pascalCase()}}Body({super.key});
+
+  final controller = PageController();
+
+  final scrollController = ScrollController(keepScrollOffset: false);
+
+  int get totalSteps => {{feature_name.pascalCase()}}Step.values.length - 1;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<{{feature_name.pascalCase()}}Bloc, {{feature_name.pascalCase()}}State>(
+        builder: (context, state) {
+          return NestedScrollView(
+            controller: scrollController,
+            headerSliverBuilder: (context, innerBoxIsScrolled) {
+              return <Widget>[
+                // TODO: add appbar here
+              ];
+            },
+            body: PageView(
+              controller: controller,
+              physics: const NeverScrollableScrollPhysics(),
+              children: [
+                {{#childrenNames}}_{{#pascalCase}}{{.}}{{/pascalCase}}Page(),
+                {{/childrenNames}}
+              ],
+            ),
+          );
+        },
+      );
+  }
+}
+{{/isStepper}}

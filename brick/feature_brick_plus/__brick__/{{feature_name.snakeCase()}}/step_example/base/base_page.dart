@@ -1,40 +1,43 @@
 
-/// {@template {{feature_name.snakeCase()}}_body}
-/// Body of the {{feature_name.pascalCase()}}Page.
-///
-/// Add what it does
+
+/// {@template travel_subscription_page}
+/// A description for {{feature_name.pascalCase()}}Page
 /// {@endtemplate}
-class {{feature_name.pascalCase()}}Body extends StatelessWidget {
-  /// {@macro {{feature_name.snakeCase()}}_body}
-  {{feature_name.pascalCase()}}Body({super.key});
+class {{feature_name.pascalCase()}}Page extends StatelessWidget {
+  /// {@macro travel_subscription_page}
+  const {{feature_name.pascalCase()}}Page({
+    required this.params,
+    super.key,
+  });
 
-  final controller = PageController();
+  static const path = '/$routeName';
 
-  final scrollController = ScrollController(keepScrollOffset: false);
-
-  int get totalSteps => {{feature_name.pascalCase()}}Step.values.length - 1;
+  static const routeName = '{{feature_name.paramCase()}}';
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<{{feature_name.pascalCase()}}Bloc, {{feature_name.pascalCase()}}State>(
-        builder: (context, state) {
-          return NestedScrollView(
-            controller: scrollController,
-            headerSliverBuilder: (context, innerBoxIsScrolled) {
-              return <Widget>[
-                // TODO: add appbar here
-              ];
-            },
-            body: PageView(
-              controller: controller,
-              physics: const NeverScrollableScrollPhysics(),
-              children: [
-                {{#childrenNames}}_{{#pascalCase}}{{.}}{{/pascalCase}}Page(),
-                {{/childrenNames}}
-              ],
-            ),
-          );
-        },
-      );
+
+    return BlocProvider(
+          create: (context) => {{feature_name.pascalCase()}}Bloc(),
+      child: const Scaffold(
+        appBar: AppBar(
+          title: const Text('{{feature_name.pascalCase()}}'),
+        ),
+        body: {{feature_name.pascalCase()}}View(),
+      ),
+    );
+  }
+}
+
+/// {@template travel_subscription_view}
+/// Displays the Body of {{feature_name.pascalCase()}}View
+/// {@endtemplate}
+class {{feature_name.pascalCase()}}View extends StatelessWidget {
+  /// {@macro travel_subscription_view}
+  const {{feature_name.pascalCase()}}View({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return {{feature_name.pascalCase()}}Body();
   }
 }
