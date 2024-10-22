@@ -1,15 +1,22 @@
-import 'package:equatable/equatable.dart';
+{{#isTabbed}}import 'package:equatable/equatable.dart';{{/isTabbed}}{{#isStepper}}import 'package:equatable/equatable.dart';{{/isStepper}}
 import 'package:flutter/material.dart';
 import 'package:{{{fullPath}}}/bloc/bloc.dart';
 
 part 'package:{{{fullPath}}}/base/{{feature_name.snakeCase()}}_body.dart';
-{{#isTabbed}}//TODO: remember to add the part/part of importations in any additional widget you add to any of your tabs.
+{{#isTabbed}}//TODO: remember to add the part/part of in any additional widget you add to any of your tabs.
 {{#childrenNames}}part 'package:{{{fullPath}}}/tabs/{{#snakeCase}}{{.}}{{/snakeCase}}/base/{{#snakeCase}}{{.}}{{/snakeCase}}_page.dart';
 part 'package:{{{fullPath}}}/tabs/{{#snakeCase}}{{.}}{{/snakeCase}}/base/{{#snakeCase}}{{.}}{{/snakeCase}}_body.dart';
 part 'package:{{{fullPath}}}/tabs/{{#snakeCase}}{{.}}{{/snakeCase}}/bloc/{{#snakeCase}}{{.}}{{/snakeCase}}_bloc.dart';
 part 'package:{{{fullPath}}}/tabs/{{#snakeCase}}{{.}}{{/snakeCase}}/bloc/{{#snakeCase}}{{.}}{{/snakeCase}}_event.dart';
 part 'package:{{{fullPath}}}/tabs/{{#snakeCase}}{{.}}{{/snakeCase}}/bloc/{{#snakeCase}}{{.}}{{/snakeCase}}_state.dart';
 {{/childrenNames}}{{/isTabbed}}
+{{#isStepper}}//TODO: remember to add the part/part of in any additional widget you add to any of your tabs.
+{{#childrenNames}}part 'package:{{{fullPath}}}/steps/{{#snakeCase}}{{.}}{{/snakeCase}}/base/{{#snakeCase}}{{.}}{{/snakeCase}}_page.dart';
+part 'package:{{{fullPath}}}/steps/{{#snakeCase}}{{.}}{{/snakeCase}}/base/{{#snakeCase}}{{.}}{{/snakeCase}}_body.dart';
+part 'package:{{{fullPath}}}/steps/{{#snakeCase}}{{.}}{{/snakeCase}}/bloc/{{#snakeCase}}{{.}}{{/snakeCase}}_bloc.dart';
+part 'package:{{{fullPath}}}/steps/{{#snakeCase}}{{.}}{{/snakeCase}}/bloc/{{#snakeCase}}{{.}}{{/snakeCase}}_event.dart';
+part 'package:{{{fullPath}}}/steps/{{#snakeCase}}{{.}}{{/snakeCase}}/bloc/{{#snakeCase}}{{.}}{{/snakeCase}}_state.dart';
+{{/childrenNames}}{{/isStepper}}
 
 /// {@template {{feature_name.snakeCase()}}_page}
 /// A description for {{feature_name.pascalCase()}}Page
@@ -131,4 +138,41 @@ class _{{feature_name.pascalCase()}}View extends StatelessWidget {
       tabController: _tabController,
     );
   }
-}{{/isTabbed}}
+}{{/isTabbed}}{{#isStepper}}
+class {{feature_name.pascalCase()}}Page extends StatelessWidget {
+  /// {@macro travel_subscription_page}
+  const {{feature_name.pascalCase()}}Page({
+    super.key,
+  });
+
+  static const path = '/$routeName';
+
+  static const routeName = '{{feature_name.paramCase()}}';
+
+  @override
+  Widget build(BuildContext context) {
+
+    return BlocProvider(
+          create: (context) => {{feature_name.pascalCase()}}Bloc(),
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('{{feature_name.pascalCase()}}'),
+        ),
+        body: {{feature_name.pascalCase()}}View(),
+      ),
+    );
+  }
+}
+
+/// {@template travel_subscription_view}
+/// Displays the Body of {{feature_name.pascalCase()}}View
+/// {@endtemplate}
+class {{feature_name.pascalCase()}}View extends StatelessWidget {
+  /// {@macro travel_subscription_view}
+  const {{feature_name.pascalCase()}}View({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return _{{feature_name.pascalCase()}}Body();
+  }
+}{{/isStepper}}

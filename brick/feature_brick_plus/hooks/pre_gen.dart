@@ -15,6 +15,9 @@ Future run(HookContext context) async {
 
   int childrenAmount = 0;
   List<String> childrenNames = [];
+  String firstChild = '';
+  String lastChild = '';
+  List<Map<String, dynamic>> children = [];
   if (isStepper || isTabbed) {
     while (true) {
       late bool isAmountCorrect;
@@ -37,6 +40,16 @@ Future run(HookContext context) async {
           throw InvalidChildrenException();
         } else {
           isAmountCorrect = true;
+          firstChild = childrenNames.first;
+          lastChild = childrenNames.last;
+          children = childrenNames
+              .map((child) => {
+                    'name': child,
+                    'isFirst': child == firstChild,
+                    'isLast': child == lastChild,
+                    'index': childrenNames.indexOf(child),
+                  })
+              .toList();
         }
       } on InvalidChildrenException {
         logger.warn(
@@ -88,7 +101,10 @@ Future run(HookContext context) async {
       'isBottomModal': isBottomModal,
       'childrenAmount': childrenAmount,
       'childrenNames': childrenNames,
+      'firstChild': firstChild,
+      'lastChild': lastChild,
       'include_tests': includeTests,
+      'children': children,
       // 'isBloc': isBloc,
       // 'isCubit': isCubit,
       // 'isProvider': isProvider,
