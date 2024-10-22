@@ -6,21 +6,56 @@ import 'package:yaml/yaml.dart';
 Future run(HookContext context) async {
   final logger = context.logger;
 
-  final stateManagement =
-      context.vars['state_management'].toString().toLowerCase();
-  final isBloc = stateManagement == 'bloc';
-  final isCubit = stateManagement == 'cubit';
-  final isProvider = stateManagement == 'provider';
-  final isRiverpod = stateManagement == 'riverpod';
-  final isNone = !isBloc && !isCubit && !isProvider && !isRiverpod;
+  final featureType = context.vars['feature_type'].toString().toLowerCase();
 
-  bool useEquatable = false;
-  if (isBloc || isCubit) {
-    useEquatable = context.logger.confirm(
-      '? Do you want to use equatable with your $stateManagement? (Y/n)',
-      defaultValue: true,
-    );
+  final isConventional = featureType == 'conventional';
+  final isStepper = featureType == 'stepper';
+  final isTabbed = featureType == 'tabbed';
+  final isBottomModal = featureType == 'bottom_modal';
+
+  int childrenAmount = 0;
+  List<String> childrenNames = [];
+  if (isStepper || isTabbed) {
+    while (true) {
+      late bool isAmountCorrect;
+
+      try {
+        final amount = context.logger.prompt(
+          '? How many ${(isStepper) ? 'steps' : 'tabs'} do you want your feature to have?',
+          defaultValue: 2,
+        );
+
+        childrenAmount = int.tryParse(amount) ?? 0;
+
+        childrenNames = context.logger.promptAny(
+          '? What are the names of these ${(isStepper) ? 'steps' : 'tabs'}? Please use comas (,) to separate them: ',
+          separator: ',',
+        );
+
+        if (childrenNames.length != childrenAmount) {
+          isAmountCorrect = false;
+          throw InvalidChildrenException();
+        } else {
+          isAmountCorrect = true;
+        }
+      } on InvalidChildrenException {
+        logger.warn(
+          'The amount of ${(isStepper) ? 'steps' : 'tabs'} does not match the amount of names',
+        );
+        logger.warn(
+          'Please make sure to input as many names as the amount of children and separate each one with comas (,)',
+        );
+      }
+      if (isAmountCorrect) {
+        break;
+      }
+    }
   }
+
+  final includeTests = context.logger.confirm(
+    'Do you want to create tests for your feature?',
+    defaultValue: false,
+  );
 
   final directory = Directory.current.path;
   List<String> folders;
@@ -44,14 +79,22 @@ Future run(HookContext context) async {
 
     context.vars = {
       ...context.vars,
-      'fullPath': ('$packageName/$featurePath/${(context.vars['feature_name'] as String).snakeCase}')
-          .replaceAll('//', '/'),
-      'isBloc': isBloc,
-      'isCubit': isCubit,
-      'isProvider': isProvider,
-      'isRiverpod': isRiverpod,
-      'isNone': isNone,
-      'use_equatable': useEquatable
+      'fullPath':
+          ('$packageName/$featurePath/${(context.vars['feature_name'] as String).snakeCase}')
+              .replaceAll('//', '/'),
+      'isConventional': isConventional,
+      'isStepper': isStepper,
+      'isTabbed': isTabbed,
+      'isBottomModal': isBottomModal,
+      'childrenAmount': childrenAmount,
+      'childrenNames': childrenNames,
+      'include_tests': includeTests,
+      // 'isBloc': isBloc,
+      // 'isCubit': isCubit,
+      // 'isProvider': isProvider,
+      // 'isRiverpod': isRiverpod,
+      // 'isNone': isNone,
+      // 'use_equatable': useEquatable
     };
   } on RangeError catch (_) {
     logger.alert(
@@ -91,3 +134,5 @@ Future run(HookContext context) async {
 }
 
 class PubspecNameException implements Exception {}
+
+class InvalidChildrenException implements Exception {}
