@@ -7,6 +7,11 @@ abstract class {{feature_name.pascalCase()}}Event extends Equatable {
   List<Object?> get props => [];
 
 }
+
+class Custom{{feature_name.pascalCase()}}Event extends {{feature_name.pascalCase()}}Event {
+  const Custom{{feature_name.pascalCase()}}Event();
+}
+
 {{#isStepper}}class {{feature_name.pascalCase()}}NextStep extends {{feature_name.pascalCase()}}Event {
   const {{feature_name.pascalCase()}}NextStep({
     this.nextStep,

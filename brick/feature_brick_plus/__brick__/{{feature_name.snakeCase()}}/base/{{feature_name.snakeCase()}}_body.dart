@@ -7,7 +7,6 @@ part of 'package:{{{fullPath}}}/base/{{feature_name.snakeCase()}}_page.dart';
   /// {@macro {{feature_name.snakeCase()}}_body}
   const _{{feature_name.pascalCase()}}Body({super.key});
 
-
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<{{feature_name.pascalCase()}}Bloc, {{feature_name.pascalCase()}}State>(

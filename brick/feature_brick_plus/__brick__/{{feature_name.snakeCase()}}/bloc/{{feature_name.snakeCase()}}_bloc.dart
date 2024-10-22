@@ -32,6 +32,7 @@ class {{feature_name.pascalCase()}}Bloc extends Bloc<{{feature_name.pascalCase()
     {{feature_name.pascalCase()}}PreviousStep event,
     Emitter<{{feature_name.pascalCase()}}State> emit,
   ) async {
+    if (state.currentPageIndex == 0) return;
     final previousIndex = state.currentPageIndex - 1;
     final previousStep = state.step.previousStep;
 
